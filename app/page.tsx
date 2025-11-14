@@ -25,6 +25,7 @@ export default function Home() {
       id: Date.now().toString(),
       title: '',
       content: '',
+      color: 'blue',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };

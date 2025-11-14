@@ -3,6 +3,7 @@
 import { JournalEntry } from '@/types/journal';
 import { formatDistanceToNow } from 'date-fns';
 import { exportUtils } from '@/lib/export';
+import { getColorClasses } from '@/lib/colors';
 
 interface SidebarProps {
   entries: JournalEntry[];
@@ -51,15 +52,18 @@ export default function Sidebar({
                 onClick={() => onSelectEntry(entry.id)}
               >
                 <div className="flex justify-between items-start">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-gray-900 truncate">
-                      {entry.title || 'Untitled'}
-                    </h3>
-                    <p className="text-sm text-gray-500 mt-1">
-                      {formatDistanceToNow(new Date(entry.updatedAt), {
-                        addSuffix: true
-                      })}
-                    </p>
+                  <div className="flex-1 min-w-0 flex items-center gap-2">
+                    <div className={`w-3 h-3 rounded-full flex-shrink-0 ${getColorClasses(entry.color)}`} />
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-gray-900 truncate">
+                        {entry.title || 'Untitled'}
+                      </h3>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {formatDistanceToNow(new Date(entry.updatedAt), {
+                          addSuffix: true
+                        })}
+                      </p>
+                    </div>
                   </div>
                   <div className="flex gap-1">
                     <button
