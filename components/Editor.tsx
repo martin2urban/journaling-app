@@ -2,17 +2,20 @@
 
 import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { JournalEntry } from '@/types/journal';
+import { JournalEntry, Folder } from '@/types/journal';
 
 interface EditorProps {
   entry: JournalEntry | null;
+  folders: Folder[];
   onSave: (entry: JournalEntry) => void;
+  onAssignToFolder: (entryId: string, folderId: string | undefined) => void;
 }
 
-export default function Editor({ entry, onSave }: EditorProps) {
+export default function Editor({ entry, folders, onSave, onAssignToFolder }: EditorProps) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [isPreview, setIsPreview] = useState(false);
+  const [showFolderMenu, setShowFolderMenu] = useState(false);
 
   useEffect(() => {
     if (entry) {
@@ -72,6 +75,8 @@ export default function Editor({ entry, onSave }: EditorProps) {
     );
   }
 
+  const currentFolder = entry?.folderId ? folders.find(f => f.id === entry.folderId) : null;
+
   return (
     <div className="flex-1 flex flex-col bg-white h-screen">
       {/* Toolbar */}
@@ -84,9 +89,77 @@ export default function Editor({ entry, onSave }: EditorProps) {
           className="text-2xl font-bold text-gray-900 border-none outline-none bg-transparent flex-1"
         />
         <div className="flex items-center gap-2">
+          {/* Folder Selector */}
+          <div className="relative">
+            <button
+              onClick={() => setShowFolderMenu(!showFolderMenu)}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors text-sm"
+            >
+              <svg
+                className="w-4 h-4"
+                fill={currentFolder ? 'currentColor' : 'none'}
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
+              </svg>
+              <span className="max-w-[120px] truncate">
+                {currentFolder ? currentFolder.name : 'Unfiled'}
+              </span>
+            </button>
+
+            {/* Folder Dropdown Menu */}
+            {showFolderMenu && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                <div className="p-2">
+                  <button
+                    onClick={() => {
+                      if (entry) {
+                        onAssignToFolder(entry.id, undefined);
+                      }
+                      setShowFolderMenu(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 rounded transition-colors text-sm ${
+                      !entry?.folderId
+                        ? 'bg-blue-100 text-blue-900 font-medium'
+                        : 'hover:bg-gray-100 text-gray-700'
+                    }`}
+                  >
+                    Unfiled
+                  </button>
+                  {folders.map((folder) => (
+                    <button
+                      key={folder.id}
+                      onClick={() => {
+                        if (entry) {
+                          onAssignToFolder(entry.id, folder.id);
+                        }
+                        setShowFolderMenu(false);
+                      }}
+                      className={`w-full text-left px-3 py-2 rounded transition-colors text-sm flex items-center gap-2 ${
+                        entry?.folderId === folder.id
+                          ? 'bg-blue-100 text-blue-900 font-medium'
+                          : 'hover:bg-gray-100 text-gray-700'
+                      }`}
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
+                      </svg>
+                      {folder.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
           <button
             onClick={() => setIsPreview(!isPreview)}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`px-4 py-2 rounded-lg font-medium transition-colors text-sm ${
               isPreview
                 ? 'bg-gray-200 text-gray-900'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
