@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { JournalEntry } from '@/types/journal';
+import ShareButtons from './ShareButtons';
 
 interface EditorProps {
   entry: JournalEntry | null;
@@ -75,26 +76,30 @@ export default function Editor({ entry, onSave }: EditorProps) {
   return (
     <div className="flex-1 flex flex-col bg-white h-screen">
       {/* Toolbar */}
-      <div className="border-b border-gray-200 px-8 py-4 flex items-center justify-between">
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Entry title..."
-          className="text-2xl font-bold text-gray-900 border-none outline-none bg-transparent flex-1"
-        />
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setIsPreview(!isPreview)}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              isPreview
-                ? 'bg-gray-200 text-gray-900'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            {isPreview ? 'Edit' : 'Preview'}
-          </button>
+      <div className="border-b border-gray-200 px-8 py-4">
+        <div className="flex items-center justify-between mb-3">
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Entry title..."
+            className="text-2xl font-bold text-gray-900 border-none outline-none bg-transparent flex-1"
+          />
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsPreview(!isPreview)}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                isPreview
+                  ? 'bg-gray-200 text-gray-900'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {isPreview ? 'Edit' : 'Preview'}
+            </button>
+          </div>
         </div>
+        {/* Share Buttons */}
+        <ShareButtons entry={entry} />
       </div>
 
       {/* Editor/Preview Area */}
